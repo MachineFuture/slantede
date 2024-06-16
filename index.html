@@ -21,7 +21,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">Slanted e generator</div>
+        <div class="header">Slanted e Generator</div>
         <div>Your input:</div>
         <textarea id="inputText" oninput="generateOutput(); hideCopyMessage();"></textarea>
         <div>Choose a method</div>
@@ -39,26 +39,41 @@
         <div class="output" id="outputText"></div>
         <button class="copy-button" onclick="copyOutput()">Copy</button>
         <div class="copy-message" id="copyMessage">Copied!</div>
-        <div class="credits">Made by futuremachine on Discord. <span class="bold">Version 1.0.1</span></div>
+        <div class="credits">Made by futuremachine on Discord. <span class="bold">Version 1.0.2</span></div>
     </div>
     <script>
         function generateOutput() {
-            const inputText = document.getElementById('inputText').value, method = document.getElementById('methodSelect').value;
+            const inputText = document.getElementById('inputText').value;
+            const method = document.getElementById('methodSelect').value;
             const replacements = {
-                markdown: '*', wikitext: "''", html: '<i>', css: '<span style="font-style: italic;">', latex: '\\textit{', rtf: '{\\i ', bbcode: '[i]', javascript: "<script>document.write('<i>'"
+                markdown: ['*', '*'],
+                wikitext: ["''", "''"],
+                html: ['<i>', '</i>'],
+                css: ['<span style="font-style: italic;">', '</span>'],
+                latex: ['\\textit{', '}'],
+                rtf: ['{\\i ', '}'],
+                bbcode: ['[i]', '[/i]'],
+                javascript: ["<script>document.write('<i>'", "</i>');<\/script>"]
             };
-            document.getElementById('outputText').textContent = inputText.replace(/e+/g, match => {
-                return method === 'javascript' ? `<script>document.write('<i>${match}</i>');<\/script>` : `${replacements[method]}${match}${replacements[method].replace(/[^a-z]/g, '')}`;
-            });
+
+            const [startTag, endTag] = replacements[method];
+            const outputText = inputText.replace(/e+/g, match => `${startTag}${match}${endTag}`);
+
+            document.getElementById('outputText').innerHTML = outputText;
         }
+
         function copyOutput() {
-            navigator.clipboard.writeText(document.getElementById('outputText').textContent).then(() => {
+            const outputText = document.getElementById('outputText').textContent;
+            navigator.clipboard.writeText(outputText).then(() => {
                 document.getElementById('copyMessage').style.display = 'block';
             });
         }
+
         function hideCopyMessage() {
             document.getElementById('copyMessage').style.display = 'none';
         }
     </script>
+    <meta property="og:title" content="Slanted e Generator">
+    <meta property="og:description" content="Make all your lowercase e's become italics in this generator that supports multiple formats! Made by futuremachine on Discord.">
 </body>
 </html>
