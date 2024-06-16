@@ -5,88 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slanted e Generator</title>
     <style>
-        @font-face {
-            font-family: 'Nintendo';
-            src: url('https://machinefuture.github.io/fonts/nintendo_NTLGDB_001.ttf') format('truetype');
-        }
-
-        body {
-            font-family: 'Nintendo', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            flex-direction: column;
-        }
-
-        .container {
-            text-align: center;
-            border: 1px solid black;
-            padding: 20px;
-            font-family: 'Nintendo', sans-serif;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 80%;
-        }
-
-        textarea {
-            width: calc(100% - 20px);
-            height: 150px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid black;
-            font-family: 'Nintendo', sans-serif;
-        }
-
-        select {
-            width: calc(100% - 20px);
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid black;
-            font-family: 'Nintendo', sans-serif;
-        }
-
-        .output {
-            border: 1px solid black;
-            width: calc(100% - 20px);
-            height: 150px;
-            margin-top: 20px;
-            white-space: pre-wrap;
-            overflow-wrap: break-word;
-            padding: 10px;
-            font-family: 'Nintendo', sans-serif;
-            background-color: #f0f0f0;
-        }
-
-        .header {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-
-        .copy-button {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-family: 'Nintendo', sans-serif;
-            cursor: pointer;
-        }
-
-        .copy-message {
-            margin-top: 10px;
-            font-size: 14px;
-            color: green;
-        }
-
-        .credits {
-            margin-top: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .bold {
-            font-weight: bold;
-        }
+        @font-face { font-family: 'Nintendo'; src: url('https://machinefuture.github.io/fonts/nintendo_NTLGDB_001.ttf') format('truetype'); }
+        body, .container, textarea, select, .output, .copy-button { font-family: 'Nintendo', Arial, sans-serif; }
+        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background-color: #f0f0f0; flex-direction: column; }
+        .container { text-align: center; border: 1px solid black; padding: 20px; background-color: white; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 80%; }
+        textarea, select, .output { width: calc(100% - 20px); padding: 10px; border: 1px solid black; }
+        textarea, .output { height: 150px; margin-bottom: 20px; }
+        .output { white-space: pre-wrap; overflow-wrap: break-word; background-color: #f0f0f0; }
+        .header { font-size: 24px; margin-bottom: 10px; }
+        .copy-button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+        .copy-message { margin-top: 10px; font-size: 14px; color: green; display: none; }
+        .credits { margin-top: 20px; font-size: 14px; text-align: center; }
+        .bold { font-weight: bold; }
     </style>
 </head>
 <body>
@@ -108,48 +38,24 @@
         <div>Output:</div>
         <div class="output" id="outputText"></div>
         <button class="copy-button" onclick="copyOutput()">Copy</button>
-        <div class="copy-message" id="copyMessage" style="display: none;">Copied!</div>
-        <div class="credits">Made by futuremachine on Discord. <span class="bold">Version 1.0</span></div>
+        <div class="copy-message" id="copyMessage">Copied!</div>
+        <div class="credits">Made by futuremachine on Discord. <span class="bold">Version 1.0.1</span></div>
     </div>
-
     <script>
         function generateOutput() {
-            const inputText = document.getElementById('inputText').value;
-            const method = document.getElementById('methodSelect').value;
-
-            let outputText = inputText.replace(/e+/g, match => {
-                switch (method) {
-                    case 'markdown':
-                        return `*${match}*`;
-                    case 'wikitext':
-                        return `''${match}''`;
-                    case 'html':
-                        return `<i>${match}</i>`;
-                    case 'css':
-                        return `<span style="font-style: italic;">${match}</span>`;
-                    case 'latex':
-                        return `\\textit{${match}}`;
-                    case 'rtf':
-                        return `{\\i ${match}}`;
-                    case 'bbcode':
-                        return `[i]${match}[/i]`;
-                    case 'javascript':
-                        return `<script>document.write('<i>${match}</i>');<\/script>`;
-                    default:
-                        return match;
-                }
+            const inputText = document.getElementById('inputText').value, method = document.getElementById('methodSelect').value;
+            const replacements = {
+                markdown: '*', wikitext: "''", html: '<i>', css: '<span style="font-style: italic;">', latex: '\\textit{', rtf: '{\\i ', bbcode: '[i]', javascript: "<script>document.write('<i>'"
+            };
+            document.getElementById('outputText').textContent = inputText.replace(/e+/g, match => {
+                return method === 'javascript' ? `<script>document.write('<i>${match}</i>');<\/script>` : `${replacements[method]}${match}${replacements[method].replace(/[^a-z]/g, '')}`;
             });
-
-            document.getElementById('outputText').textContent = outputText;
         }
-
         function copyOutput() {
-            const outputText = document.getElementById('outputText').textContent;
-            navigator.clipboard.writeText(outputText).then(() => {
+            navigator.clipboard.writeText(document.getElementById('outputText').textContent).then(() => {
                 document.getElementById('copyMessage').style.display = 'block';
             });
         }
-
         function hideCopyMessage() {
             document.getElementById('copyMessage').style.display = 'none';
         }
